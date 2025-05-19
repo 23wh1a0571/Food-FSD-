@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farmers Market</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #e9f5ec;
+      color: #2a4d14;
+    }
+    h1 {
+      text-align: center;
+      color: #1b3a07;
+      text-shadow: 1px 1px 2px #c8e6c9;
+      margin-bottom: 30px;
+    }
+    .category-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .category-selector button {
+      background-color: #a1c3d2;
+      border: 2px solid #83e5f8;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #1b3a07;
+      transition: all 0.3s ease;
+      box-shadow: 1px 1px 3px #7bb47b;
+    }
+    .category-selector button.active,
+    .category-selector button:hover {
+      background-color: #4caf50;
+      color: white;
+      border-color: #2e7d32;
+      box-shadow: 0 0 8px #2e7d32;
+    }
+    #searchBar {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 12px 16px;
+      width: 320px;
+      font-size: 17px;
+      border-radius: 30px;
+      border: 2px solid #4caf50;
+      outline: none;
+      box-shadow: inset 0 0 5px #a3d2a1;
+      transition: border-color 0.3s ease;
+    }
+    #searchBar:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 8px #2e7d32;
+    }
+    #itemsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 22px;
+    }
+    .item-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgb(46 125 50 / 0.15);
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .item-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgb(46 125 50 / 0.3);
+    }
+    .item-card img {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      margin-bottom: 14px;
+    }
+    .item-name {
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 20px;
+      color: #2a4d14;
+      text-shadow: 0 1px 2px #a3d2a1;
+    }
+    .item-price {
+      font-size: 17px;
+      margin-bottom: 10px;
+      color: #4caf50;
+      font-weight: 600;
+    }
+    .item-quantity {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .add-to-cart-btn {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 3px 8px rgba(151, 210, 237, 0.6);
+    }
+    .add-to-cart-btn:hover {
+      background-color: #9fdcf0;
+      box-shadow: 0 5px 15px rgb(56 142 60 / 0.8);
+    }
+    #cart {
+      margin-top: 45px;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #f5fef7;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 12px rgb(46 125 50 / 0.15);
+      color: #1b3a07;
+    }
+    #cart h2 {
+      margin-bottom: 22px;
+      color: #2a4d14;
+      font-weight: 700;
+      text-shadow: 0 1px 1px #c8e6c9;
+    }
+    #cartItems {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #cartItems li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #c0d9b8;
+      padding-bottom: 8px;
+      font-weight: 600;
+    }
+    .remove-btn {
+      background-color: #e74c3c;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-left: 12px;
+    }
+    .remove-btn:hover {
+      background-color: #c0392b;
+    }
+    #cartTotal {
+      font-weight: 800;
+      margin-top: 20px;
+      text-align: right;
+      font-size: 20px;
+      color: #2e7d32;
+      text-shadow: 0 1px 2px #a3d2a1;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Farmers Market</h1>
+
+<div class="category-selector">
+  <button id="btnvegetables" class="active" onclick="selectCategory('vegetables')">Vegetables</button>
+  <button id="btnfruits" onclick="selectCategory('fruits')">Fruits</button>
+  <button id="btnspices" onclick="selectCategory('spices')">Spices & Herbs</button>
+  <button id="btndairy" onclick="selectCategory('dairy')">Dairy</button>
+  <button id="btngrains" onclick="selectCategory('grains')">Grains & Pulses</button>
+  <button id="btnicecream" onclick="selectCategory('icecream')">Ice Cream</button>
+  <button id="btnbakery" onclick="selectCategory('bakery')">Bakery</button>
+</div>
+
+<input type="text" id="searchBar" placeholder="Search items..." oninput="searchItems()" />
+
+<div id="itemsContainer"></div>
+
+<div id="cart">
+  <h2>Your Cart</h2>
+  <ul id="cartItems"></ul>
+  <div id="cartTotal">Total: ₹0</div>
+  <button id="proceedBtn" onclick="proceedToPay()"
+    style="margin-top: 20px; background-color: #4caf50; color: white; padding: 12px 20px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;">
+    Proceed to Pay
+  </button>
+</div>
+
+<script>
+  const vegetables = [
+    { name: "Tomato", price: 30, quantity: "1kg", image: "tomato.png" },
+    { name: "Potato", price: 20, quantity: "1kg", image: "potato.png" },
+    { name: "Carrot", price: 50, quantity: "1kg", image: "carrot.png" },
+    { name: "Onion", price: 35, quantity: "1kg", image: "onion.png" },
+    { name: "Lemon", price: 5, quantity: "1pieces", image: "lemon.png" },
+    { name: "Broccoli", price: 65, quantity: "1piece", image: "broccoli.png" },
+    { name: "Cucumber", price: 20, quantity: "1kg", image: "cucumber.png" },
+    { name: "Brinjal", price: 23, quantity: "1kg", image: "Brinjal.png" },
+    { name: "Capsicum", price: 36, quantity: "1kg", image: "Capsicum.png" },
+    { name: "Cauliflower", price: 32, quantity: "1piece", image: "Cauliflower.png" },
+    { name: "Spinach", price: 25, quantity: "1 bunch", image: "Spinach.png" },
+    { name: "Green Beans", price: 40, quantity: "1kg", image: "green_beans.png" },
+    { name: "Peas", price: 45, quantity: "1kg", image: "Peas.png" },
+    { name: "Radish", price: 22, quantity: "1kg", image: "radish.png" }
+];
+
+
+ const fruits = [
+  { name: "Apple", price: 100, quantity: "1kg", image: "apple.png" },
+  { name: "Banana", price: 40, quantity: "1 dozen", image: "banana.png" },
+  { name: "Orange", price: 60, quantity: "1kg", image: "orange.png" },
+  { name: "Mango", price: 120, quantity: "1kg", image: "mango.png" },
+  { name: "Grapes", price: 90, quantity: "1kg", image: "grapes.png" },
+  { name: "Strawberry", price: 80, quantity: "500g", image: "Strawberry.png" },
+  { name: "Kiwi", price: 90, quantity: "3 pieces", image: "Kiwi.png" },
+  { name: "Watermelon", price: 60, quantity: "1 piece", image: "Watermelon.png" },
+  { name: "Papaya", price: 80, quantity: "1 piece", image: "Papaya.png" },
+  { name: "Pomegranate", price: 190, quantity: "1kg", image: "Pomegranate.png" },
+  { name: "Cherry", price: 70, quantity: "250g", image: "cherry.png" }
+];
+
+
+  const spices = [
+  { name: "Turmeric", price: 50, quantity: "100g", image: "Turmeric.png" },
+  { name: "Cumin", price: 40, quantity: "100g", image: "Cumin.png" },
+  { name: "Coriander Seeds", price: 35, quantity: "100g", image: "Coriander Seeds.png" },
+  { name: "Cardamom", price: 120, quantity: "50g", image: "Cardamom.png" },
+  { name: "Black Pepper", price: 90, quantity: "100g", image: "Black Pepper.png" },
+  { name: "Cinnamon", price: 60, quantity: "100g", image: "Cinnamon.png" },
+  { name: "Cloves", price: 100, quantity: "50g", image: "Cloves.png" },
+  { name: "Mustard Seeds", price: 30, quantity: "100g", image: "Mustard Seeds.png" },
+  { name: "Red Chili Powder", price: 45, quantity: "100g", image: "Red Chili Powder.png" },
+  { name: "Fenugreek Seeds", price: 25, quantity: "100g", image: "Fenugreek Seeds.png" },
+  { name: "Saffron", price: 250, quantity: "1g", image: "Saffron.png" },
+  { name: "Bay Leaves", price: 20, quantity: "25g", image: "Bay Leaves.png" }
+];
+
+
+  const dairy = [
+  { name: "Milk", price: 50, quantity: "1 liter", image: "milk.png" },
+  { name: "Paneer", price: 150, quantity: "200g", image: "Paneer.png" },
+  { name: "Butter", price: 90, quantity: "100g", image: "butter.png" },
+  { name: "Yogurt", price: 60, quantity: "500g", image: "Yoget.png" },
+  { name: "Cheese", price: 200, quantity: "200g", image: "Cheese.png" },
+  { name: "Cream", price: 80, quantity: "200ml", image: "Cream.png" },
+  { name: "Ghee", price: 300, quantity: "500g", image: "Ghee.png" },
+  { name: "Condensed Milk", price: 120, quantity: "400g", image: "Condensed Milk.png" },
+  { name: "Milk Powder", price: 350, quantity: "1kg", image: "Milk Powder.png" },
+  { name: "Buttermilk", price: 30, quantity: "500ml", image: "Buttermilk.png" }
+];
+
+  const grains = [
+    { name: "Rice", price: 60, image: "https://i.imgur.com/EN3c1pr.png" },
+    { name: "Wheat", price: 45, image: "https://i.imgur.com/RuKYw5b.png" },
+    { name: "Lentils", price: 70, image: "https://i.imgur.com/fQY9QIq.png" }
+  ];
+const icecream = [
+  { name: "Vanilla", price: 60, quantity: "100ml", image: "vanilla.png" },
+  { name: "Chocolate", price: 70, quantity: "100ml", image: "chocolate.png" },
+  { name: "Strawberry", price: 65, quantity: "100ml", image: "strawberryice.png" },
+  { name: "Butterscotch", price: 75, quantity: "100ml", image: "butterscotch.png" },
+  { name: "Mango", price: 70, quantity: "100ml", image: "mangoice.png" },
+  { name: "Black Currant", price: 80, quantity: "100ml", image: "blackcurrant.png" },
+  { name: "Pista", price: 85, quantity: "100ml", image: "pista.png" },
+  { name: "Red Velvet", price: 115, quantity: "100ml", image: "Red Velvet.png" },
+  { name: "Cookies and Cream", price: 95, quantity: "100ml", image: "cookiescream.png" },
+  { name: "Caramel Swirl", price: 100, quantity: "100ml", image: "caramelswirl.png" }
+];
+
+
+  const bakery = [
+  { name: "Bread", price: 25, quantity: "400g", image: "bread.png" },
+  { name: "Cake", price: 150, quantity: "500g", image: "cake.png" },
+  { name: "Burger", price: 110, quantity: "1 piece", image: "Burger.png" },
+  { name: "Cookies", price: 90, quantity: "250g", image: "Cookies.png" },
+  { name: "Croissant", price: 40, quantity: "2 pieces", image: "Croissant.png" },
+  { name: "Muffin", price: 35, quantity: "1 piece", image: "Muffin.png" },
+  { name: "Sandwich", price: 70, quantity: "1 piece", image: "sandwich.png" },
+  { name: "Doughnut", price: 30, quantity: "1 piece", image: "Doughnut.png" },
+  { name: "Pastry", price: 45, quantity: "1 piece", image: "Pastry.png" },
+  { name: "Bun", price: 20, quantity: "1 piece", image: "Bun.png" },
+  { name: "Brownie", price: 50, quantity: "1 piece", image: "Brownie.png" },
+  { name: "Pie", price: 120, quantity: "400g", image: "Pie.png" },
+  { name: "Cupcake", price: 40, quantity: "1 piece", image: "Cupcake.png" },
+  { name: "Pizza", price: 240, quantity: "1 piece", image: "pizza.png" },
+];
+
+
+  let currentCategory = "vegetables";
+  let cart = [];
+
+  function selectCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll(".category-selector button").forEach(btn => {
+      btn.classList.remove("active");
+    });
+    document.getElementById("btn" + category).classList.add("active");
+    document.getElementById("searchBar").value = "";
+    renderItems();
+  }
+
+  function renderItems() {
+    const container = document.getElementById("itemsContainer");
+    container.innerHTML = "";
+    const items = getCategoryItems(currentCategory);
+    const searchText = document.getElementById("searchBar").value.trim().toLowerCase();
+    const filteredItems = items.filter(item => item.name.toLowerCase().includes(searchText));
+
+    if (filteredItems.length === 0) {
+      container.innerHTML = "<p>No items found.</p>";
+      return;
+    }
+
+    filteredItems.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "item-card";
+      card.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">₹${item.price}</div>
+        ${item.quantity ? `<div class="item-quantity">${item.quantity}</div>` : ""}
+        <button class="add-to-cart-btn" onclick='addToCart(${JSON.stringify(item)})'>Add to Cart</button>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function getCategoryItems(category) {
+    switch (category) {
+      case "vegetables": return vegetables;
+      case "fruits": return fruits;
+      case "spices": return spices;
+      case "dairy": return dairy;
+      case "grains": return grains;
+      case "icecream": return icecream;
+      case "bakery": return bakery;
+      default: return [];
+    }
+  }
+
+  function addToCart(item) {
+    const found = cart.find(i => i.name === item.name);
+    if (found) {
+      found.quantity++;
+    } else {
+      cart.push({ ...item, quantity: 1 });
+    }
+    renderCart();
+  }
+
+  function renderCart() {
+    const cartList = document.getElementById("cartItems");
+    cartList.innerHTML = "";
+    let total = 0;
+    if (cart.length === 0) {
+      cartList.innerHTML = "<li>Your cart is empty.</li>";
+    } else {
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ₹${item.price} x ${item.quantity}`;
+        cartList.appendChild(li);
+      });
+    }
+    document.getElementById("cartTotal").textContent = `Total: ₹${total}`;
+  }
+
+  function searchItems() {
+    renderItems();
+  }
+
+  function proceedToPay() {
+    if (cart.length === 0) {
+      alert("Cart is empty.");
+      return;
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "bill.html";
+  }
+
+  renderItems();
+  renderCart();
+</script>
+</body>
+</html>
