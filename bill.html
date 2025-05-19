@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bill Summary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f9f0;
+      margin: 20px;
+      color: #2a4d14;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #1b3a07;
+      text-shadow: 1px 1px 2px #c8e6c9;
+    }
+    #billContainer {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 12px rgb(46 125 50 / 0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #c0d9b8;
+    }
+    th {
+      background-color: #e9f5ec;
+    }
+    #totalAmount {
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #2e7d32;
+    }
+    .payment-section {
+      margin-top: 40px;
+    }
+    .payment-section input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+    #payBtn {
+      background-color: #4caf50;
+      color: white;
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    #payBtn:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Order Summary</h1>
+  <div id="billContainer">
+    <h2>Items</h2>
+    <table id="billTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price (₹)</th>
+          <th>Total (₹)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="totalAmount">Total: ₹0</div>
+
+    <div class="payment-section">
+      <h2>Payment</h2>
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Your name" required />
+
+      <label for="card">Card Number</label>
+      <input type="text" id="card" placeholder="1234 5678 9012 3456" required />
+
+      <label for="expiry">Expiry Date</label>
+      <input type="text" id="expiry" placeholder="MM/YY" required />
+
+      <label for="cvv">CVV</label>
+      <input type="text" id="cvv" placeholder="123" required />
+
+      <button id="payBtn" onclick="payNow()">Pay Now</button>
+    </div>
+  </div>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const tbody = document.querySelector("#billTable tbody");
+    const totalAmountEl = document.getElementById("totalAmount");
+
+    let grandTotal = 0;
+
+    if (cart.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; font-weight:600;'>No items in the cart.</td></tr>";
+      totalAmountEl.textContent = "Total: ₹0";
+    } else {
+      cart.forEach(item => {
+        const row = document.createElement("tr");
+        const total = item.price * item.quantity;
+        grandTotal += total;
+
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.quantity}</td>
+          <td>₹${item.price}</td>
+          <td>₹${total}</td>
+        `;
+        tbody.appendChild(row);
+      });
+      totalAmountEl.textContent = `Total: ₹${grandTotal}`;
+    }
+
+    function payNow() {
+      const name = document.getElementById("name").value.trim();
+      const card = document.getElementById("card").value.trim();
+      const expiry = document.getElementById("expiry").value.trim();
+      const cvv = document.getElementById("cvv").value.trim();
+
+      if (!name || !card || !expiry || !cvv) {
+        alert("Please fill all payment fields.");
+        return;
+      }
+
+      alert(`Payment successful! ₹${grandTotal} has been paid. Thank you, ${name}!`);
+
+      // Clear cart after payment
+      localStorage.removeItem("cart");
+
+      // Optional: Redirect to a success/thank-you page
+      // window.location.href = "thankyou.html";
+    }
+  </script>
+
+</body>
+</html>
